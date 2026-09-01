@@ -14,9 +14,10 @@ A Telegram bot that automatically monitors and notifies about emission events in
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.12+ (f-strings with nested quotes are used)
 - pyTelegramBotAPI (telebot)
 - requests
+- python-dotenv
 - Telegram Bot Token
 - StalCraft API credentials (Client ID and Client Secret)
 
@@ -30,41 +31,43 @@ cd stalcraft-emission-bot
 
 2. Install required dependencies:
 ```bash
-pip install pyTelegramBotAPI requests
+pip install -r requirements.txt
 ```
 
-3. Create a `.env` file or `keys.json` based on the template:
+3. Create a `.env` file from the template and fill in your credentials:
 ```bash
 cp .env.example .env
 ```
 
-4. Configure your environment variables (see Configuration section below)
-
 ## Configuration
 
-### Environment Variables
+All secrets are read from environment variables (see `Config.py`). Locally they are
+loaded from the `.env` file in the project root; in production they can be provided
+as real environment variables (Docker, systemd, CI). Real environment variables take
+priority over values from `.env`.
 
-Create a `keys.json` file in the project root with the following structure:
+### Required
 
-```json
-{
-    "TG-Client-Token": "your_telegram_bot_token_here",
-    "Client-Secret": "your_stalcraft_client_secret_here",
-    "Client-ID": "your_stalcraft_client_id_here"
-}
-```
+| Variable | Description |
+| --- | --- |
+| `TG_CLIENT_TOKEN` | Your Telegram Bot API token (obtain from [@BotFather](https://t.me/BotFather)) |
+| `CLIENT_SECRET` | Your StalCraft API Client Secret |
+| `CLIENT_ID` | Your StalCraft API Client ID |
 
-Or use `.env.example` as a template:
+### Optional
 
-- **TG_CLIENT_TOKEN** - Your Telegram Bot API token (obtain from [@BotFather](https://t.me/BotFather))
-- **CLIENT_SECRET** - Your StalCraft API Client Secret
-- **CLIENT_ID** - Your StalCraft API Client ID
+| Variable | Default | Description |
+| --- | --- | --- |
+| `STEAM_API_KEY` | _empty_ | Steam Web API key for player count requests |
+
+If any required variable is missing, the bot exits immediately on startup with a
+message listing what needs to be set.
 
 ### Getting StalCraft API Credentials
 
 1. Visit the [StalCraft API documentation](https://eapi.stalcraft.net/)
 2. Register your application to receive Client ID and Client Secret
-3. Add these credentials to your `keys.json` configuration file
+3. Add these credentials to your `.env` file
 
 ## Usage
 
@@ -91,10 +94,11 @@ The bot will:
 stalcraft-emission-bot/
 ├── Main.py              # Main bot entry point and emission checker
 ├── Tools.py             # Utility functions for token reading and API calls
+├── Config.py            # Environment variable loading and validation
 ├── Debug.py             # Logging utilities
 ├── GetOnline.py         # Steam player count fetcher
-├── JsonMaster.py        # JSON handling utilities
-├── keys.json            # Configuration file (not committed to git)
+├── requirements.txt     # Python dependencies
+├── .env                 # Secrets and settings (not committed to git)
 ├── .env.example         # Environment variable template
 ├── .gitignore          # Git ignore rules
 ├── photo.png           # Emission notification image

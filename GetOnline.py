@@ -1,9 +1,18 @@
+import requests
+from Config import Config
+
+
 class Online:
 
     @staticmethod
     def GetStalCraftOnline():
-        import requests
-        URL = "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=1818450&key="
+        # Ключ для этого метода Steam API не обязателен, но при лимитах его стоит задать
+        # в .env как STEAM_API_KEY
+        steam_key = Config.get("STEAM_API_KEY", default="")
+        URL = (
+            "https://api.steampowered.com/ISteamUserStats/"
+            f"GetNumberOfCurrentPlayers/v1/?appid=1818450&key={steam_key}"
+        )
         try:
             response = requests.get(URL)
             data = response.json()
@@ -11,7 +20,3 @@ class Online:
             return ConvertData
         except:
             return "Не установлен"
-
-#import Debug
-#Debug.WriteLine(type='OK', message=f"Актуальный онлайн: {Online.GetStalCraftOnline()}")
-

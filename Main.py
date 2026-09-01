@@ -1,11 +1,19 @@
+import sys
 import telebot
 import Debug
 import Tools
+from Config import Config, ConfigError
 import time as sleeper
 from datetime import datetime, timedelta, timezone
 import threading
 
-TOKEN = Tools.Tool.reader()
+# Проверяем конфиг до старта: если чего-то не хватает — падаем сразу и с понятным сообщением
+try:
+    Config.validate()
+except ConfigError as e:
+    sys.exit(f"\033[91m[Config]\033[0;0m {e}")
+
+TOKEN = Config.get("TG_CLIENT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 Debug.NewFileLogs(datetime.now(timezone.utc).strftime("%Y.%d.%m %H %M %S"))
 Debug.WriteLine("Info", f"Бот был запущен в {datetime.now(timezone.utc).strftime("%Y-%d-%m %H:%M:%S")}")

@@ -1,22 +1,32 @@
+import os
 from datetime import datetime
 
+LOGS_DIR = "Logs"
+
+
 def NewFileLogs(name):
-    file = open(f"name.nlf", "w")
-    file.write(name)
+    os.makedirs(LOGS_DIR, exist_ok=True)
+    with open("name.nlf", "w", encoding="utf-8") as file:
+        file.write(name)
+
+
 def WriteLine(type, message):
-    name = open(f"name.nlf", "r")
+    os.makedirs(LOGS_DIR, exist_ok=True)
+    try:
+        with open("name.nlf", "r", encoding="utf-8") as name:
+            log_name = name.read().strip()
+    except FileNotFoundError:
+        log_name = datetime.now().strftime("%Y.%m.%d")
+
     time = datetime.now()
     ftime = time.strftime("%H:%M:%S")
-    file = open(f"Logs/{name.read()}.log", "a")
-    name.close()
-    if type == "Error":
-        print(f"\033[0;32m[{ftime}]\033[91m[Error]: \033[0;0m{message}")
-        file.write(f"[{ftime}][Error]: {message}\n")
-    elif type == "Warn":
-        print(f"\033[0;32m[{ftime}]\033[1;33m[Warn]: \033[0;0m{message}")
-        file.write(f"[{ftime}][Warn]: {message}\n")
-    else:
-        print(f"\033[0;32m[{ftime}]\033[0;32m[Info]: \033[0;0m{message}")
-        file.write(f"[{ftime}][Info]: {message}\n")
-    file.close()
-#WriteLine("Warn", "End the message")
+    with open(f"{LOGS_DIR}/{log_name}.log", "a", encoding="utf-8") as file:
+        if type == "Error":
+            print(f"\033[0;32m[{ftime}]\033[91m[Error]: \033[0;0m{message}")
+            file.write(f"[{ftime}][Error]: {message}\n")
+        elif type == "Warn":
+            print(f"\033[0;32m[{ftime}]\033[1;33m[Warn]: \033[0;0m{message}")
+            file.write(f"[{ftime}][Warn]: {message}\n")
+        else:
+            print(f"\033[0;32m[{ftime}]\033[0;32m[Info]: \033[0;0m{message}")
+            file.write(f"[{ftime}][Info]: {message}\n")

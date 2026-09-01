@@ -1,30 +1,24 @@
 import requests
 import Debug
-import json
+from Config import Config
+
 
 class Tool:
     @staticmethod
-    def reader():
-        with open("keys.json", "r") as f:
-            data = json.load(f)
-        TOKEN = data["TG-Client-Token"]
-        return TOKEN
+    def token():
+        """Токен Telegram-бота (переменная окружения TG_CLIENT_TOKEN)."""
+        return Config.get("TG_CLIENT_TOKEN")
 
     @staticmethod
     def EmissionCheck():
         url = "https://eapi.stalcraft.net/RU/emission"
 
-        with open("keys.json", "r") as f:
-            data = json.load(f)
-
         headers = {
-        "Content-Type": "application/json",
-        "Client-Secret": data["Client-Secret"],
-        "Client-ID": data["Client-ID"],
+            "Content-Type": "application/json",
+            "Client-Secret": Config.get("CLIENT_SECRET"),
+            "Client-ID": Config.get("CLIENT_ID"),
         }
 
         response = requests.get(url, headers=headers)
         Debug.WriteLine("Info", response.text)
         return response
-    #print(response.text)
-#EmissionCheck()
