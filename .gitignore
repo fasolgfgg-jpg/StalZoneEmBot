@@ -1,0 +1,28 @@
+# Environment variables and secrets
+.env
+.env.local
+# keys.json больше не используется (секреты в .env), но держим в игноре на всякий случай
+keys.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Bot data
+MessageID.ids
+Logs/
+*.log
+*.nlf
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
