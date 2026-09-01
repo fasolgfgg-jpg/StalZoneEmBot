@@ -48,10 +48,13 @@ def check():
             u_bound = previous_start + timedelta(seconds=30)
             emission = l_bound <= ctime <= u_bound
         except Exception as e:
-            Debug.WriteLine("", f"Ошибка при попытке выполнить запрос {e}")
+            if str(e) == "'currentStart'":
+                pass
+            else:
+                Debug.WriteLine("Error", f"Ошибка при попытке выполнить запрос {e}")
 
         if emission:
-            Debug.WriteLine("Info", "Выброс скоро начнется! Отправляем сообщение...")
+            Debug.WriteLine("Info", "Выброс скоро начнется! Сообщение готово к отправке")
             sender(StartTime)
             sleeper.sleep(200)
         else:
