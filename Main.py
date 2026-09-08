@@ -81,7 +81,7 @@ def sender(CurrentTime: datetime):
                                      f"🕥 **Время начала:** {StartTime.strftime("%H:%M")} (по МСК)\n"
                                      f"🕚 **Время окончания:** {EndTime.strftime("%H:%M")} (по МСК)\n\n"
                                      f"👥 Онлайн: {GetOnline.Online.GetStalCraftOnline()}\n\n"
-                                     f"[t.me/InformSCX](https://t.me/InformSCX)", parse_mode='Markdown')
+                                     f"[t.me/SZInform](https://t.me/SZInform)", parse_mode='Markdown')
 
         sleeper.sleep(240)
 
