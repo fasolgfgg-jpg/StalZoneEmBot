@@ -6,8 +6,8 @@ from Config import Config, ConfigError
 import time as sleeper
 from datetime import datetime, timedelta, timezone
 import threading
+from pathlib import Path
 
-# Проверяем конфиг до старта: если чего-то не хватает — падаем сразу и с понятным сообщением
 try:
     Config.validate()
 except ConfigError as e:
@@ -15,9 +15,18 @@ except ConfigError as e:
 
 TOKEN = Config.get("TG_CLIENT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
-Debug.NewFileLogs(datetime.now(timezone.utc).strftime("%Y.%d.%m %H %M %S"))
-Debug.WriteLine("Info", f"Бот был запущен в {datetime.now(timezone.utc).strftime("%Y-%d-%m %H:%M:%S")}")
 
+Debug.NewFileLogs(datetime.now(timezone.utc).strftime("%Y.%d.%m %H %M %S"))
+Debug.WriteLine("Info", f"Бот был запущен в {datetime.now(timezone.utc).strftime('%Y-%d-%m %H:%M:%S')}")
+
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+MSG_ID_FILE = DATA_DIR / "MessageID.ids"
+PHOTO_FILE = BASE_DIR / "photos" / "photo.png"
 
 #----------------------------------------Commands------------------------------------#
 @bot.message_handler(commands=['start'])
@@ -70,27 +79,29 @@ def sender(CurrentTime: datetime):
     import GetOnline
     try:
         try:
-            f = open('MessageID.ids', 'r')
+            f = open(MSG_ID_FILE, 'r', encoding="utf-8")
             end_id = f.readline()
             bot.delete_messages("@InformSCX", message_ids=[int(end_id)])
             f.close()
         except:
             pass
-        photo = open("photo.png", "rb")
+        photo = open(PHOTO_FILE, "rb")
         bot.send_photo("@InformSCX", photo= photo, caption= "☢️ Выброс начался!\n\n"
-                                     f"🕥 **Время начала:** {StartTime.strftime("%H:%M")} (по МСК)\n"
-                                     f"🕚 **Время окончания:** {EndTime.strftime("%H:%M")} (по МСК)\n\n"
+                                     f"🕥 **Время начала:** {StartTime.strftime('%H:%M')} (по МСК)\n"
+                                     f"🕚 **Время окончания:** {EndTime.strftime('%H:%M')} (по МСК)\n\n"
                                      f"👥 Онлайн: {GetOnline.Online.GetStalCraftOnline()}\n\n"
                                      f"[t.me/SZInform](https://t.me/SZInform)", parse_mode='Markdown')
 
         sleeper.sleep(240)
 
-        f = open('MessageID.ids', 'a')
+        #f = open('MessageID.ids', 'a')
+        f = open(MSG_ID_FILE, 'w', encoding="utf-8")
         #f.write(f"{em_id.message_id}\n")
 
         end_id = bot.send_message("@InformSCX", "☁️ Выброс закончился!")
         f.write(f"{end_id.message_id}\n")
         f.close()
+        photo.close()
 
 
 

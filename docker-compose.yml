@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  stalzone-bot:
+    build: .
+    container_name: stalzone_bot
+    restart: unless-stopped
+
+    volumes:
+      - ./data:/app/data
+      - ./photos:/app/photos 
+    
+    env_file:
+      - .env
