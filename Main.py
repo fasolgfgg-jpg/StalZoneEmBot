@@ -31,12 +31,12 @@ PHOTO_FILE = BASE_DIR / "photos" / "photo.png"
 #----------------------------------------Commands------------------------------------#
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "Команды бота находятся в разработке, вы можете подписаться на уведомления о выбросах в нашем канале: t.me/InformSCX")
+    bot.reply_to(message, "Команды бота находятся в разработке, вы можете подписаться на уведомления о выбросах в нашем канале: t.me/SZInform")
     sleeper.sleep(10)
 
 @bot.message_handler(commands=['help'])
 def send_help(message):
-    bot.reply_to(message, "Команды бота находятся в разработке, вы можете подписаться на уведомления о выбросах в нашем канале: t.me/InformSCX")
+    bot.reply_to(message, "Команды бота находятся в разработке, вы можете подписаться на уведомления о выбросах в нашем канале: t.me/SZInform")
     sleeper.sleep(10)
 #----------------------------------------Commands------------------------------------#
 

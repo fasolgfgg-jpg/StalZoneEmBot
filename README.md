@@ -17,7 +17,7 @@ channel when one starts.
 ### Features
 
 - 🔔 **Emission Detection** - Polls the emission API every 25 seconds
-- 📢 **Channel Notifications** - Posts alerts to [@InformSCX](https://t.me/InformSCX)
+- 📢 **Channel Notifications** - Posts alerts to [@SZInform](https://t.me/SZInform)
 - 🎮 **Player Count** - Includes the current online count from the Steam API
 - 🕐 **Timezone Conversion** - Converts UTC timestamps to Moscow time (MSK)
 - 📸 **Visual Notifications** - Sends notifications with an emission-themed image
@@ -26,7 +26,7 @@ channel when one starts.
 
 ### Requirements
 
-- Python 3.12+ (the code uses f-strings with nested quotes, PEP 701)
+- Python 3.11+ (the Docker image is based on `python:3.11-slim`)
 - Telegram bot token
 - Emission API credentials (Client ID and Client Secret)
 - Reachable `api.telegram.org` (see [Troubleshooting](#troubleshooting))
@@ -84,6 +84,28 @@ in a background thread.
 
 **Commands:** `/start`, `/help`
 
+### Running with Docker
+
+```bash
+cp .env.example .env        # fill in your credentials
+docker compose up -d --build
+docker compose logs -f      # follow the logs
+docker compose down
+```
+
+The image does not contain `.env`: it is excluded by `.dockerignore` and passed to
+the container through `env_file`. Logs and `MessageID.ids` live in `./data`, which
+is mounted into the container, so they survive a rebuild.
+
+Running the image without Compose works too, but the variables must be passed
+explicitly:
+
+```bash
+docker build -t stalzone-bot .
+docker run -d --name stalzone_bot --env-file .env \
+  -v "$PWD/data:/app/data" -v "$PWD/photos:/app/photos" stalzone-bot
+```
+
 ### How It Works
 
 1. The `check()` function runs in a separate thread and polls the emission API every
@@ -106,26 +128,28 @@ StalZoneEmBot/
 ├── Debug.py             # Logging utilities
 ├── GetOnline.py         # Steam player count fetcher
 ├── requirements.txt     # Dependencies
-├── .env                 # Secrets and settings (not committed)
+├── Dockerfile           # Container image (python:3.11-slim)
+├── docker-compose.yml   # Compose service: volumes and env
+├── .dockerignore        # Files excluded from the image (including .env)
+├── .env                 # Secrets and settings (not in git, not in the image)
 ├── .env.example         # Environment variable template
 ├── .gitignore           # Git ignore rules
-├── photo.png            # Emission notification image
-├── photo1.png           # Alternative notification image
-├── MessageID.ids        # Message IDs for cleanup
-└── name.nlf             # Current log file name
+├── photos/              # Emission notification image
+└── data/                # Runtime data: logs and MessageID.ids (mounted)
 ```
 
 ### Logging
 
-Logs are written to the `Logs/` directory via the `Debug` module: emission checks,
-API responses, message sending, and errors.
+Logs are written to the `data/logs/` directory via the `Debug` module: emission
+checks, API responses, message sending, and errors. The directory is mounted from
+the host, so logs persist between container restarts.
 
 ### Troubleshooting
 
 | Symptom | Cause |
 | --- | --- |
 | `ConnectTimeout: api.telegram.org` on startup | Telegram is unreachable from your network. Route traffic through a proxy, e.g. `export HTTPS_PROXY=socks5://127.0.0.1:1080`, or set `telebot.apihelper.proxy` in code. |
-| `Ошибка при попытке выполнить запрос 'currentStart'` repeating | Normal idle state: no emission is scheduled, so the response has no `currentStart` field. |
+| Only `Выброс не ожидается` repeating, nothing else | Normal idle state: no emission is scheduled, so the response has no `currentStart` field. The resulting `KeyError` is suppressed; only genuine request failures are logged as errors. |
 | Bot exits with `Отсутствуют обязательные переменные окружения` | Some required variables are missing or blank in `.env`. |
 
 ### Notes
@@ -135,7 +159,7 @@ API responses, message sending, and errors.
 - Emission API endpoint: `https://eapi.stalcraft.net/RU/emission`
 - Player count source: Steam API, AppID `1818450`
 
-Official channel: [@InformSCX](https://t.me/InformSCX)
+Official channel: [@SZInform](https://t.me/SZInform)
 
 ---
 
@@ -147,7 +171,7 @@ Official channel: [@InformSCX](https://t.me/InformSCX)
 ### Возможности
 
 - 🔔 **Детект выброса** — опрос API каждые 25 секунд
-- 📢 **Уведомления в канал** — публикация в [@InformSCX](https://t.me/InformSCX)
+- 📢 **Уведомления в канал** — публикация в [@SZInform](https://t.me/SZInform)
 - 🎮 **Онлайн игроков** — количество игроков из Steam API
 - 🕐 **Конвертация времени** — перевод UTC в московское время (MSK)
 - 📸 **Оформление** — отправка уведомления с картинкой выброса
@@ -156,7 +180,7 @@ Official channel: [@InformSCX](https://t.me/InformSCX)
 
 ### Требования
 
-- Python 3.12+ (в коде используются f-строки с вложенными кавычками, PEP 701)
+- Python 3.11+ (образ собирается на `python:3.11-slim`)
 - Токен телеграм-бота
 - Ключи API выбросов (Client ID и Client Secret)
 - Доступность `api.telegram.org` (см. [Возможные проблемы](#возможные-проблемы))
@@ -214,6 +238,27 @@ python Main.py
 
 **Команды:** `/start`, `/help`
 
+### Запуск через Docker
+
+```bash
+cp .env.example .env        # заполните ключи
+docker compose up -d --build
+docker compose logs -f      # смотреть логи
+docker compose down
+```
+
+`.env` в образ не попадает: он исключён через `.dockerignore` и передаётся
+в контейнер через `env_file`. Логи и `MessageID.ids` лежат в `./data`, который
+монтируется в контейнер, поэтому сохраняются при пересборке.
+
+Запуск образа без Compose тоже работает, но переменные нужно передать явно:
+
+```bash
+docker build -t stalzone-bot .
+docker run -d --name stalzone_bot --env-file .env \
+  -v "$PWD/data:/app/data" -v "$PWD/photos:/app/photos" stalzone-bot
+```
+
 ### Как это работает
 
 1. Функция `check()` работает в отдельном потоке и опрашивает API выбросов каждые
@@ -235,26 +280,28 @@ StalZoneEmBot/
 ├── Debug.py             # Логирование
 ├── GetOnline.py         # Онлайн игроков через Steam
 ├── requirements.txt     # Зависимости
-├── .env                 # Секреты и настройки (не в git)
+├── Dockerfile           # Образ контейнера (python:3.11-slim)
+├── docker-compose.yml   # Сервис Compose: тома и переменные
+├── .dockerignore        # Что не попадает в образ (в том числе .env)
+├── .env                 # Секреты и настройки (не в git и не в образе)
 ├── .env.example         # Шаблон переменных окружения
 ├── .gitignore           # Правила игнорирования
-├── photo.png            # Картинка для уведомления о выбросе
-├── photo1.png           # Запасная картинка
-├── MessageID.ids        # ID сообщений для очистки
-└── name.nlf             # Имя текущего файла лога
+├── photos/              # Картинка для уведомления о выбросе
+└── data/                # Данные работы: логи и MessageID.ids (монтируется)
 ```
 
 ### Логи
 
-Логи пишутся в каталог `Logs/` через модуль `Debug`: проверки выбросов, ответы API,
-отправка сообщений и ошибки.
+Логи пишутся в каталог `data/logs/` через модуль `Debug`: проверки выбросов,
+ответы API, отправка сообщений и ошибки. Каталог смонтирован с хоста, поэтому
+логи сохраняются между перезапусками контейнера.
 
 ### Возможные проблемы
 
 | Симптом | Причина |
 | --- | --- |
 | При старте `ConnectTimeout: api.telegram.org` | Telegram недоступен из вашей сети. Нужен прокси, например `export HTTPS_PROXY=socks5://127.0.0.1:1080`, либо `telebot.apihelper.proxy` в коде. |
-| Постоянно повторяется `Ошибка при попытке выполнить запрос 'currentStart'` | Нормальное состояние покоя: выброс не назначен, поэтому поля `currentStart` в ответе нет. |
+| В логе только `Выброс не ожидается` и больше ничего | Нормальное состояние покоя: выброс не назначен, поэтому поля `currentStart` в ответе нет. Возникающий при этом `KeyError` гасится, как ошибки логируются только реальные сбои запроса. |
 | Бот завершается с `Отсутствуют обязательные переменные окружения` | В `.env` не хватает каких-то обязательных переменных или они пустые. |
 
 ### Примечания
@@ -264,4 +311,4 @@ StalZoneEmBot/
 - Endpoint API выбросов: `https://eapi.stalcraft.net/RU/emission`
 - Источник онлайна: Steam API, AppID `1818450`
 
-Официальный канал: [@InformSCX](https://t.me/InformSCX)
+Официальный канал: [@SZInform](https://t.me/SZInform)

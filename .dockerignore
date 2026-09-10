@@ -5,3 +5,5 @@ __pycache__/
 .git/
 .DS_Store
 .env
+removed_old_cache/
+Logs/
