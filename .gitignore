@@ -17,6 +17,7 @@ __pycache__/
 # Bot data
 MessageID.ids
 Logs/
+removed_old_cache/
 *.log
 *.nlf
 

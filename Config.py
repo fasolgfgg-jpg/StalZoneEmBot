@@ -1,12 +1,3 @@
-"""Конфигурация проекта.
-
-Все секреты и настройки читаются из переменных окружения.
-Локально значения берутся из файла `.env` в корне проекта (шаблон — `.env.example`),
-в продакшене — из реального окружения (shell, Docker, systemd, CI).
-
-Приоритет: реальные переменные окружения важнее значений из `.env`.
-"""
-
 import os
 
 try:
@@ -33,11 +24,6 @@ class Config:
 
     @classmethod
     def get(cls, name, default=None):
-        """Возвращает значение переменной окружения.
-
-        Пустое значение обязательной переменной (из REQUIRED) считается ошибкой,
-        если не передан `default`.
-        """
         if name in cls._cache:
             return cls._cache[name]
 
@@ -55,7 +41,7 @@ class Config:
 
     @classmethod
     def get_int(cls, name, default):
-        """То же, что get(), но приводит значение к int."""
+        #То же, что get(), но приводит значение к int.
         raw = cls.get(name, default=str(default))
         try:
             return int(raw)
@@ -66,11 +52,8 @@ class Config:
 
     @classmethod
     def validate(cls):
-        """Проверяет, что все обязательные переменные заданы.
+        """Проверяет, что все обязательные переменные заданы."""
 
-        Вызывается при старте, чтобы упасть сразу и с понятным сообщением,
-        а не в середине работы бота.
-        """
         missing = [name for name in cls.REQUIRED if not (os.getenv(name) or "").strip()]
         if missing:
             raise ConfigError(
