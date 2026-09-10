@@ -81,12 +81,12 @@ def sender(CurrentTime: datetime):
         try:
             f = open(MSG_ID_FILE, 'r', encoding="utf-8")
             end_id = f.readline()
-            bot.delete_messages("@InformSCX", message_ids=[int(end_id)])
+            bot.delete_messages("@SZInform", message_ids=[int(end_id)])
             f.close()
         except:
             pass
         photo = open(PHOTO_FILE, "rb")
-        bot.send_photo("@InformSCX", photo= photo, caption= "☢️ Выброс начался!\n\n"
+        bot.send_photo("@SZInform", photo= photo, caption= "☢️ Выброс начался!\n\n"
                                      f"🕥 **Время начала:** {StartTime.strftime('%H:%M')} (по МСК)\n"
                                      f"🕚 **Время окончания:** {EndTime.strftime('%H:%M')} (по МСК)\n\n"
                                      f"👥 Онлайн: {GetOnline.Online.GetStalCraftOnline()}\n\n"
@@ -98,7 +98,7 @@ def sender(CurrentTime: datetime):
         f = open(MSG_ID_FILE, 'w', encoding="utf-8")
         #f.write(f"{em_id.message_id}\n")
 
-        end_id = bot.send_message("@InformSCX", "☁️ Выброс закончился!")
+        end_id = bot.send_message("@SZInform", "☁️ Выброс закончился!")
         f.write(f"{end_id.message_id}\n")
         f.close()
         photo.close()
