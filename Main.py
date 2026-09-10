@@ -6,15 +6,19 @@ from Config import Config, ConfigError
 import time as sleeper
 from datetime import datetime, timedelta, timezone
 import threading
+from pathlib import Path
 
-# Проверяем конфиг до старта: если чего-то не хватает — падаем сразу и с понятным сообщением
 try:
     Config.validate()
 except ConfigError as e:
     sys.exit(f"\033[91m[Config]\033[0;0m {e}")
 
+BASE_DIR = Path(__file__).resolve().parent
+photo_path = BASE_DIR / "photos/photo.png"
+
 TOKEN = Config.get("TG_CLIENT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
+
 Debug.NewFileLogs(datetime.now(timezone.utc).strftime("%Y.%d.%m %H %M %S"))
 Debug.WriteLine("Info", f"Бот был запущен в {datetime.now(timezone.utc).strftime("%Y-%d-%m %H:%M:%S")}")
 
@@ -76,7 +80,7 @@ def sender(CurrentTime: datetime):
             f.close()
         except:
             pass
-        photo = open("photo.png", "rb")
+        photo = open(photo_path, "rb")
         bot.send_photo("@InformSCX", photo= photo, caption= "☢️ Выброс начался!\n\n"
                                      f"🕥 **Время начала:** {StartTime.strftime("%H:%M")} (по МСК)\n"
                                      f"🕚 **Время окончания:** {EndTime.strftime("%H:%M")} (по МСК)\n\n"
